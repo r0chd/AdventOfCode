@@ -30,8 +30,8 @@ pub fn main() !void {
     const alloc = heap.page_allocator;
 
     const input = mem.trimEnd(u8, @embedFile("./input.txt"), "\n");
-    std.debug.print("First solution: {any}\n", .{first(input)});
-    std.debug.print("Second solution: {any}\n", .{second(input)});
+    std.debug.print("First solution: {}\n", .{try first(input)});
+    std.debug.print("Second solution: {}\n", .{try second(input)});
 
     var bench = zbench.Benchmark.init(alloc, .{});
     defer bench.deinit();

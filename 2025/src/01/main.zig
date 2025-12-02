@@ -10,12 +10,14 @@ const Direction = enum(u8) {
     right = 82,
 };
 
-pub fn first(input: []const u8) !i32 {
+pub fn first(comptime input: []const u8) !i32 {
     var lines = mem.splitScalar(u8, input, '\n');
 
     var pos: i32 = 50;
     var sum: i32 = 0;
     while (lines.next()) |line| {
+        if (line.len == 0) break;
+
         const direction: Direction = @enumFromInt(line[0]);
         const number = try fmt.parseInt(i32, line[1..], 10);
 
@@ -29,12 +31,14 @@ pub fn first(input: []const u8) !i32 {
     return sum;
 }
 
-pub fn second(input: []const u8) !i32 {
+pub fn second(comptime input: []const u8) !i32 {
     var lines = mem.splitScalar(u8, input, '\n');
 
     var pos: i32 = 50;
     var sum: i32 = 0;
     while (lines.next()) |line| {
+        if (line.len == 0) break;
+
         const direction: Direction = @enumFromInt(line[0]);
         const number = try fmt.parseInt(i32, line[1..], 10);
 
@@ -57,13 +61,13 @@ pub fn second(input: []const u8) !i32 {
 }
 
 fn benchFirst(alloc: mem.Allocator) void {
-    const input = mem.trimEnd(u8, @embedFile("./input.txt"), "\n");
+    const input = comptime mem.trimEnd(u8, @embedFile("./input.txt"), "\n");
     _ = first(input) catch {};
     _ = alloc;
 }
 
 fn benchSecond(alloc: mem.Allocator) void {
-    const input = mem.trimEnd(u8, @embedFile("./input.txt"), "\n");
+    const input = comptime mem.trimEnd(u8, @embedFile("./input.txt"), "\n");
     _ = second(input) catch {};
     _ = alloc;
 }
@@ -71,9 +75,9 @@ fn benchSecond(alloc: mem.Allocator) void {
 pub fn main() !void {
     const alloc = heap.page_allocator;
 
-    const input = mem.trimEnd(u8, @embedFile("./input.txt"), "\n");
-    std.debug.print("First solution: {any}\n", .{first(input)});
-    std.debug.print("Second solution: {any}\n", .{second(input)});
+    const input = comptime mem.trimEnd(u8, @embedFile("./input.txt"), "\n");
+    std.debug.print("First solution: {any}\n", .{try first(input)});
+    std.debug.print("Second solution: {any}\n", .{try second(input)});
 
     var bench = zbench.Benchmark.init(alloc, .{});
     defer bench.deinit();

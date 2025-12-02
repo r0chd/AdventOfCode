@@ -1,7 +1,8 @@
 const std = @import("std");
 const heap = std.heap;
+const fs = std.fs;
 
-pub fn build(b: *std.Build) void {
+pub fn build(b: *std.Build) !void {
     const target = b.standardTargetOptions(.{});
     const optimize = b.standardOptimizeOption(.{});
 
@@ -13,9 +14,11 @@ pub fn build(b: *std.Build) void {
 
     const alloc = arena.allocator();
 
-    for (1..13) |day| {
-        const name = std.fmt.allocPrint(alloc, "{}", .{day}) catch @panic("OOM");
-        const path = std.fmt.allocPrint(alloc, "src/{}/main.zig", .{day}) catch @panic("OOM");
+    const dir = try fs.cwd().openDir("./src", .{ .iterate = true });
+    var iter = dir.iterate();
+    while (try iter.next()) |file| {
+        const name = try std.fmt.allocPrint(alloc, "{s}", .{file.name});
+        const path = try std.fmt.allocPrint(alloc, "src/{s}/main.zig", .{file.name});
         const exe = b.addExecutable(.{
             .name = name,
             .root_module = b.createModule(.{
