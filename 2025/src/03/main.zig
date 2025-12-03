@@ -20,15 +20,30 @@ pub fn first(comptime input: []const u8) !u32 {
             }
         }
 
-        sum += try std.fmt.parseInt(u32, bytes[0..2], 10);
+        sum += try fmt.parseInt(u32, bytes[0..2], 10);
     }
 
     return sum;
 }
 
-pub fn second(comptime input: []const u8) !u32 {
-    _ = input;
-    return 0;
+pub fn second(comptime input: []const u8) !u64 {
+    var sum: u64 = 0;
+
+    var lines = mem.splitScalar(u8, input, '\n');
+    while (lines.next()) |line| {
+        var buffer: [12]u8 = undefined;
+        var current: usize = 0;
+        for (0..12) |i| {
+            const buf = line[current..(line.len - (12 - i) + 1)];
+            current = mem.indexOfMax(u8, buf) + current;
+            buffer[i] = line[current];
+            current += 1;
+        }
+
+        sum += try fmt.parseInt(u64, &buffer, 10);
+    }
+
+    return sum;
 }
 
 fn benchFirst(alloc: mem.Allocator) void {
